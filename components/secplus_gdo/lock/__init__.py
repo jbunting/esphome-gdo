@@ -9,11 +9,7 @@ DEPENDENCIES = ["secplus_gdo"]
 
 GDOLock = secplus_gdo_ns.class_("GDOLock", lock.Lock, cg.Component)
 
-CONFIG_SCHEMA = lock.LOCK_SCHEMA.extend(
-    {
-        cv.GenerateID(): cv.declare_id(GDOLock),
-    }
-).extend(SECPLUS_GDO_CONFIG_SCHEMA)
+CONFIG_SCHEMA = lock.lock_schema(GDOLock).extend(SECPLUS_GDO_CONFIG_SCHEMA)
 
 
 async def to_code(config):

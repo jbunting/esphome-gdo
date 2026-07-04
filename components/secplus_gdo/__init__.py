@@ -37,7 +37,7 @@ _next_auto_uart_num = 1
 
 
 def _validate_esp_idf(config):
-    if not CORE.using_esp_idf:
+    if CORE.target_framework != "esp-idf":
         raise cv.Invalid(
             "secplus_gdo requires the esp-idf framework. Set "
             "esp32: framework: type: esp-idf in your configuration."

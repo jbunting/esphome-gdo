@@ -9,11 +9,7 @@ DEPENDENCIES = ["secplus_gdo"]
 
 GDODoor = secplus_gdo_ns.class_("GDODoor", cover.Cover, cg.Component)
 
-CONFIG_SCHEMA = cover.COVER_SCHEMA.extend(
-    {
-        cv.GenerateID(): cv.declare_id(GDODoor),
-    }
-).extend(SECPLUS_GDO_CONFIG_SCHEMA)
+CONFIG_SCHEMA = cover.cover_schema(GDODoor).extend(SECPLUS_GDO_CONFIG_SCHEMA)
 
 
 async def to_code(config):

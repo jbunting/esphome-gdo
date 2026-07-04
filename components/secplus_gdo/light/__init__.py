@@ -9,11 +9,9 @@ DEPENDENCIES = ["secplus_gdo"]
 
 GDOLight = secplus_gdo_ns.class_("GDOLight", light.LightOutput, cg.Component)
 
-CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend(
-    {
-        cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(GDOLight),
-    }
-).extend(SECPLUS_GDO_CONFIG_SCHEMA)
+CONFIG_SCHEMA = light.light_schema(GDOLight, light.LightType.BINARY).extend(
+    SECPLUS_GDO_CONFIG_SCHEMA
+)
 
 
 async def to_code(config):
