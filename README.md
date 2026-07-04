@@ -24,8 +24,8 @@ external_components:
     components: [secplus_gdo]
 ```
 
-The component declares its own dependency on gdolib and the linker flag used to
-safe the TX pin on a panic, so you don't need to touch `lib_deps`.
+The component declares its own dependency on gdolib, so you don't need to add it
+to `lib_deps` yourself.
 
 ## Hub configuration (`secplus_gdo:`)
 

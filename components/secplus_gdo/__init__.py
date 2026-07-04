@@ -90,7 +90,6 @@ async def to_code(config):
     cg.add(var.set_obstruction_from_status(config[CONF_OBSTRUCTION_FROM_STATUS]))
     cg.add(var.set_invert_uart(config[CONF_INVERT_UART]))
 
-    # The component declares its own native dependency and the linker wrap used
-    # to safe the TX pin on a panic, so consumers don't have to touch lib_deps.
+    # The component declares its own native dependency, so consumers don't have
+    # to add gdolib to lib_deps themselves.
     cg.add_library("gdolib", None, "https://github.com/jbunting/gdolib#840f634")
-    cg.add_build_flag("-Wl,--wrap=esp_panic_handler")

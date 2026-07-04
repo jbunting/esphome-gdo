@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <string>
-#include <vector>
 
 #include "esphome/core/hal.h"
 #include "esphome/core/helpers.h"
@@ -19,10 +18,6 @@ static const char *const TAG = "secplus_gdo";
 
 // How often loop() checks the rolling code and flushes it to NVS when changed.
 static const uint32_t ROLLING_CODE_SAVE_INTERVAL_MS = 5000;
-
-// TX pins of every hub, disabled by the panic-handler wrap below so a crash
-// cannot leave a pin driving the opener open. Populated in setup().
-static std::vector<uint8_t> g_gdo_tx_pins;  // NOLINT(runtime/global-variables)
 
 // gdolib invokes this from its task; forward to the owning hub instance.
 static void gdo_event_callback(const gdo_status_t *status, gdo_cb_event_t event, void *arg) {
@@ -56,9 +51,6 @@ void GDOHub::setup() {
     this->saved_rolling_code_ = restored;
     ESP_LOGD(TAG, "Restored rolling code %" PRIu32, restored);
   }
-
-  // Register the TX pin for the panic-handler safeing wrap.
-  g_gdo_tx_pins.push_back(static_cast<uint8_t>(this->tx_pin_));
 
   // Hand the context to the entities before their setup() runs.
   if (this->door_ != nullptr) {
@@ -182,22 +174,3 @@ void GDOHub::dump_config() {
 
 }  // namespace secplus_gdo
 }  // namespace esphome
-
-// Wrap the panic handler so a crash cannot leave any GDO TX pin driving the
-// opener. Reconfigure every registered TX pin as a pulled-down input, then fall
-// through to the real handler.
-extern "C" {
-#include "driver/gpio.h"
-#include "hal/gpio_hal.h"
-
-void __real_esp_panic_handler(void *info);
-
-void __wrap_esp_panic_handler(void *info) {
-  for (uint8_t pin : esphome::secplus_gdo::g_gdo_tx_pins) {
-    gpio_hal_iomux_func_sel(GPIO_PIN_MUX_REG[pin], PIN_FUNC_GPIO);
-    gpio_set_direction(static_cast<gpio_num_t>(pin), GPIO_MODE_INPUT);
-    gpio_pulldown_en(static_cast<gpio_num_t>(pin));
-  }
-  __real_esp_panic_handler(info);
-}
-}  // extern "C"
