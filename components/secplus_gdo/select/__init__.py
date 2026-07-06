@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jared Bunting
+# Derived from gdolib and konnected-io/konnected-esphome (both GPL-3.0-or-later).
+
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import select

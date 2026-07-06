@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Jared Bunting
+// Derived from gdolib and konnected-io/konnected-esphome (both GPL-3.0-or-later).
+
 #pragma once
 
 #include <functional>

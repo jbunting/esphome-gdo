@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jared Bunting
+# Derived from gdolib and konnected-io/konnected-esphome (both GPL-3.0-or-later).
+
 """ESPHome external component for Chamberlain/LiftMaster Security+ garage door
 openers, driven by gdolib (https://github.com/argilo/secplus + Konnected's
 gdolib). This is the hub component; entities live in the cover/, light/ and

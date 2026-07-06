@@ -160,3 +160,10 @@ obstruction / motor / button), `sensor` (openings / time-to-close),
 `switch` (learn / toggle-only), `select` (protocol), and `number`
 (open/close duration, client id, rolling code). The full `example.yaml`
 compiles under ESPHome 2026.6.
+
+## License
+
+GPL-3.0-or-later — see [LICENSE](LICENSE). This component builds on and is
+derived from [gdolib](https://github.com/jbunting/gdolib) and
+[konnected-io/konnected-esphome](https://github.com/konnected-io/konnected-esphome),
+both GPL-3.0-or-later.
