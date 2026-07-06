@@ -10,7 +10,14 @@ namespace secplus_gdo {
 class GDOLock : public lock::Lock, public Component {
  public:
   void set_gdo_handle(gdo_handle_t handle) { this->gdo_ = handle; }
-  void set_sync_state(bool synced) { this->synced_ = synced; }
+
+  void on_gdo_event(const gdo_status_t *status, gdo_cb_event_t event) {
+    if (event == GDO_CB_EVENT_SYNCED) {
+      this->synced_ = status->synced;
+    } else if (event == GDO_CB_EVENT_LOCK) {
+      this->set_state(status->lock);
+    }
+  }
 
   // Reflect opener-reported lock state.
   void set_state(gdo_lock_state_t state) {

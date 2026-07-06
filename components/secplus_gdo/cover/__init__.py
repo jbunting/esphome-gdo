@@ -17,4 +17,9 @@ async def to_code(config):
     await cg.register_component(var, config)
     await cover.register_cover(var, config)
     hub = await cg.get_variable(config[CONF_SECPLUS_GDO_ID])
-    cg.add(hub.register_door(var))
+    cg.add(hub.add_handle_listener(cg.RawExpression(f"[](gdo_handle_t h) {{ {var}->set_gdo_handle(h); }}")))
+    cg.add(
+        hub.add_event_listener(
+            cg.RawExpression(f"[](const gdo_status_t *s, gdo_cb_event_t e) {{ {var}->on_gdo_event(s, e); }}")
+        )
+    )

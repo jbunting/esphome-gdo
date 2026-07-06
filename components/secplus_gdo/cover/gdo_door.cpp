@@ -47,6 +47,23 @@ void GDODoor::control(const cover::CoverCall &call) {
   }
 }
 
+void GDODoor::on_gdo_event(const gdo_status_t *status, gdo_cb_event_t event) {
+  switch (event) {
+    case GDO_CB_EVENT_SYNCED:
+      this->synced_ = status->synced;
+      break;
+    case GDO_CB_EVENT_DOOR_POSITION: {
+      // gdolib: 0 = open, 10000 = closed, -1 = unknown.
+      float position =
+          status->door_position < 0 ? NAN : static_cast<float>(10000 - status->door_position) / 10000.0f;
+      this->set_state(status->door, position);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 void GDODoor::set_state(gdo_door_state_t state, float position) {
   if (!std::isnan(position)) {
     this->position = position;

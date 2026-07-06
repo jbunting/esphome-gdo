@@ -8,10 +8,11 @@ from .. import SECPLUS_GDO_CONFIG_SCHEMA, secplus_gdo_ns, CONF_SECPLUS_GDO_ID
 DEPENDENCIES = ["secplus_gdo"]
 
 GDOSensor = secplus_gdo_ns.class_("GDOSensor", sensor.Sensor, cg.Component)
+GDOSensorType = secplus_gdo_ns.enum("GDOSensorType", is_class=True)
 
 TYPES = {
-    "openings": "register_openings",
-    "time_to_close": "register_ttc",
+    "openings": GDOSensorType.OPENINGS,
+    "time_to_close": GDOSensorType.TIME_TO_CLOSE,
 }
 
 CONFIG_SCHEMA = (
@@ -29,7 +30,10 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await sensor.register_sensor(var, config)
     await cg.register_component(var, config)
+    cg.add(var.set_type(TYPES[config[CONF_TYPE]]))
     hub = await cg.get_variable(config[CONF_SECPLUS_GDO_ID])
-    register = TYPES[config[CONF_TYPE]]
-    # The entity is a global, so the lambda references it without capturing.
-    cg.add(getattr(hub, register)(cg.RawExpression(f"[](float x) {{ {var}->publish_state(x); }}")))
+    cg.add(
+        hub.add_event_listener(
+            cg.RawExpression(f"[](const gdo_status_t *s, gdo_cb_event_t e) {{ {var}->on_gdo_event(s, e); }}")
+        )
+    )

@@ -18,6 +18,12 @@ class GDOSelect : public select::Select, public Component {
   void set_gdo_handle(gdo_handle_t handle) { this->gdo_ = handle; }
   void set_initial_option(const std::string &option) { this->initial_option_ = option; }
 
+  void on_gdo_event(const gdo_status_t *status, gdo_cb_event_t event) {
+    if (event == GDO_CB_EVENT_SYNCED && status->synced) {
+      this->update_state(status->protocol);
+    }
+  }
+
   void setup() override {
     this->pref_ = global_preferences->make_preference<size_t>(this->get_object_id_hash());
     size_t index;

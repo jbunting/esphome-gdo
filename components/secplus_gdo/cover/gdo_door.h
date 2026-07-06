@@ -16,10 +16,10 @@ class GDODoor : public cover::Cover, public Component {
   void control(const cover::CoverCall &call) override;
 
   void set_gdo_handle(gdo_handle_t handle) { this->gdo_ = handle; }
-  void set_sync_state(bool synced) { this->synced_ = synced; }
+  void on_gdo_event(const gdo_status_t *status, gdo_cb_event_t event);
 
-  // Called by the hub on a door-position event. position is the ESPHome cover
-  // position (1.0 = open, 0.0 = closed), or NAN if unknown.
+  // Applies a door-position update. position is the ESPHome cover position
+  // (1.0 = open, 0.0 = closed), or NAN if unknown.
   void set_state(gdo_door_state_t state, float position);
 
  protected:

@@ -10,12 +10,12 @@ DEPENDENCIES = ["secplus_gdo"]
 GDONumber = secplus_gdo_ns.class_("GDONumber", number.Number, cg.Component)
 GDONumberType = secplus_gdo_ns.enum("GDONumberType", is_class=True)
 
-# name -> (hub register method, C++ enum value, min, max, step)
+# name -> (C++ enum value, min, max, step)
 TYPES = {
-    "open_duration": ("register_open_duration", GDONumberType.OPEN_DURATION, 0, 65000, 100),
-    "close_duration": ("register_close_duration", GDONumberType.CLOSE_DURATION, 0, 65000, 100),
-    "client_id": ("register_client_id", GDONumberType.CLIENT_ID, 0, 0xFFFFFFFF, 1),
-    "rolling_code": ("register_rolling_code", GDONumberType.ROLLING_CODE, 0, 0xFFFFFFF, 1),
+    "open_duration": (GDONumberType.OPEN_DURATION, 0, 65000, 100),
+    "close_duration": (GDONumberType.CLOSE_DURATION, 0, 65000, 100),
+    "client_id": (GDONumberType.CLIENT_ID, 0, 0xFFFFFFFF, 1),
+    "rolling_code": (GDONumberType.ROLLING_CODE, 0, 0xFFFFFFF, 1),
 }
 
 CONFIG_SCHEMA = (
@@ -30,9 +30,14 @@ CONFIG_SCHEMA = (
 
 
 async def to_code(config):
-    register, enum_value, lo, hi, step = TYPES[config[CONF_TYPE]]
+    enum_value, lo, hi, step = TYPES[config[CONF_TYPE]]
     var = await number.new_number(config, min_value=lo, max_value=hi, step=step)
     await cg.register_component(var, config)
     cg.add(var.set_type(enum_value))
     hub = await cg.get_variable(config[CONF_SECPLUS_GDO_ID])
-    cg.add(getattr(hub, register)(var))
+    cg.add(hub.add_handle_listener(cg.RawExpression(f"[](gdo_handle_t h) {{ {var}->set_gdo_handle(h); }}")))
+    cg.add(
+        hub.add_event_listener(
+            cg.RawExpression(f"[](const gdo_status_t *s, gdo_cb_event_t e) {{ {var}->on_gdo_event(s, e); }}")
+        )
+    )

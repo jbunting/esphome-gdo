@@ -15,6 +15,12 @@ class GDOSwitch : public switch_::Switch, public Component {
   void set_gdo_handle(gdo_handle_t handle) { this->gdo_ = handle; }
   void set_type(GDOSwitchType type) { this->type_ = type; }
 
+  void on_gdo_event(const gdo_status_t *status, gdo_cb_event_t event) {
+    if (this->type_ == GDOSwitchType::LEARN && event == GDO_CB_EVENT_LEARN) {
+      this->publish_state(status->learn == GDO_LEARN_STATE_ACTIVE);
+    }
+  }
+
   void setup() override {
     // Toggle-only is a persisted setting restored into the context before start.
     // Learn is momentary and intentionally not restored.

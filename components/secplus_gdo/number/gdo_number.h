@@ -20,6 +20,31 @@ class GDONumber : public number::Number, public Component {
   void set_gdo_handle(gdo_handle_t handle) { this->gdo_ = handle; }
   void set_type(GDONumberType type) { this->type_ = type; }
 
+  void on_gdo_event(const gdo_status_t *status, gdo_cb_event_t event) {
+    switch (this->type_) {
+      case GDONumberType::OPEN_DURATION:
+        if (event == GDO_CB_EVENT_OPEN_DURATION_MEASUREMENT) {
+          this->update_state(static_cast<float>(status->open_ms));
+        }
+        break;
+      case GDONumberType::CLOSE_DURATION:
+        if (event == GDO_CB_EVENT_CLOSE_DURATION_MEASUREMENT) {
+          this->update_state(static_cast<float>(status->close_ms));
+        }
+        break;
+      case GDONumberType::CLIENT_ID:
+        if (event == GDO_CB_EVENT_SYNCED && status->synced) {
+          this->update_state(static_cast<float>(status->client_id));
+        }
+        break;
+      case GDONumberType::ROLLING_CODE:
+        if (event == GDO_CB_EVENT_SYNCED && status->synced) {
+          this->update_state(static_cast<float>(status->rolling_code));
+        }
+        break;
+    }
+  }
+
   void setup() override {
     // Durations are user-tunable settings persisted here and pushed into the
     // context before start. client_id/rolling_code are runtime state persisted
