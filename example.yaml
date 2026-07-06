@@ -62,3 +62,75 @@ lock:
   - platform: secplus_gdo
     secplus_gdo_id: gdo_right
     name: Right Garage Lock
+
+# The remaining platforms are shown on the left opener only, for brevity.
+binary_sensor:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: motion
+    name: Left Motion
+    device_class: motion
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: obstruction
+    name: Left Obstruction
+    device_class: problem
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: motor
+    name: Left Motor
+    device_class: running
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: button
+    name: Left Wall Button
+
+sensor:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: openings
+    name: Left Openings
+    icon: mdi:counter
+    state_class: total_increasing
+
+switch:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: learn
+    name: Left Learn
+    entity_category: config
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: toggle_only
+    name: Left Toggle Only
+    entity_category: config
+
+select:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    name: Left Protocol
+    entity_category: config
+
+number:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: open_duration
+    name: Left Open Duration
+    unit_of_measurement: ms
+    entity_category: config
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: close_duration
+    name: Left Close Duration
+    unit_of_measurement: ms
+    entity_category: config
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: client_id
+    name: Left Client ID
+    entity_category: config
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_left
+    type: rolling_code
+    name: Left Rolling Code
+    entity_category: config

@@ -74,8 +74,56 @@ lock:
 The cover supports open/close/stop/toggle and position (move-to-target).
 gdolib handles Security+ v1 vs v2 auto-detection, the toggle-only /
 stop-then-toggle behavior, and rolling-code management; the hub persists the
-Security+ 2.0 rolling code to flash so the opener keeps accepting commands
-across reboots.
+Security+ 2.0 credentials (client id + rolling code) to flash so the opener
+keeps accepting commands across reboots.
+
+### Read-only sensors
+
+```yaml
+binary_sensor:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_main
+    type: motion          # motion | obstruction | motor | button
+    name: Garage Motion
+
+sensor:
+  - platform: secplus_gdo
+    secplus_gdo_id: gdo_main
+    type: openings        # openings | time_to_close
+    name: Garage Openings
+```
+
+### Controls and settings
+
+```yaml
+switch:
+  - platform: secplus_gdo
+    type: learn           # learn | toggle_only
+    name: Garage Learn
+
+select:
+  - platform: secplus_gdo
+    name: Garage Protocol   # auto / secplus_v1 / secplus_v2 / secplus_v1_with_smart_panel
+    initial_option: auto
+
+number:
+  - platform: secplus_gdo
+    type: open_duration   # open_duration | close_duration | client_id | rolling_code
+    name: Garage Open Duration
+    unit_of_measurement: ms
+```
+
+Notes:
+- `open_duration` / `close_duration` (ms) are measured automatically the first
+  time the door makes a full run, and are needed for `move-to-target` position
+  control. They persist and are restored into the opener on boot.
+- `toggle_only` forces the single-button behavior for openers without a status
+  line; it persists across reboots.
+- `select` (protocol) restores the saved protocol on boot to skip
+  auto-detection; changing it after startup reboots to apply cleanly.
+- `client_id` / `rolling_code` numbers are for visibility and advanced
+  pre-sync override. They display as floats, so very large rolling-code values
+  lose precision — the exact values are persisted by the hub, not the number.
 
 ## Multiple openers
 
@@ -107,6 +155,8 @@ See [`example.yaml`](example.yaml) for a complete two-opener configuration.
 
 ## Status
 
-Core entities (cover, light, lock) are implemented. Learn/toggle-only switches,
-protocol select, duration / client-id / rolling-code numbers, and motion /
-motor / button / openings sensors are planned.
+All entities are implemented: cover, light, lock, `binary_sensor` (motion /
+obstruction / motor / button), `sensor` (openings / time-to-close),
+`switch` (learn / toggle-only), `select` (protocol), and `number`
+(open/close duration, client id, rolling code). The full `example.yaml`
+compiles under ESPHome 2026.6.
