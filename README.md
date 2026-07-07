@@ -48,7 +48,7 @@ secplus_gdo:
 | `obstruction_pin` | pin | — | Optional discrete obstruction-sensor input. |
 | `obstruction_from_status` | bool | `true` | Derive obstruction from Sec+ 2.0 status frames instead of a pin. |
 | `invert_uart` | bool | `false` | Invert the UART signal (set `true` for inverting interfaces). |
-| `uart_num` | 0–2 | auto | UART port. Omit to auto-assign starting at UART1 (UART0 is the console). |
+| `uart_num` | int | auto | UART port. Omit to auto-assign a free port from UART1 up (UART0 stays the console). Explicit values are validated against the chip's UART count and checked for cross-hub collisions. |
 
 ## Entities
 
