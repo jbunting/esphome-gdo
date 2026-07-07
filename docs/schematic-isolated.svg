@@ -38,14 +38,19 @@
 <polyline class="w" points="354,430 354,460"/>
 <polyline class="w" points="354,460 354,469"/><line class="w" x1="344" y1="469" x2="364" y2="469"/><line class="w" x1="348" y1="473" x2="360" y2="473"/><line class="w" x1="351.5" y1="477" x2="356.5" y2="477"/>
 <polyline class="w" points="486,270 486,172"/>
-<polyline class="w" points="486,172 595,172"/>
+<polyline class="w" points="486,172 588,172"/>
 <circle cx="486" cy="172" r="3.6" fill="#111"/>
 <text x="492" y="165" class="val" text-anchor="start">opener Vcc</text>
-<rect x="595" y="150" width="120" height="46" rx="6" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="4 3"/><text x="605" y="168" class="val" text-anchor="start">12 V -&gt; Vcc</text>
-<polyline class="w" points="715,172 770,172 770,255"/>
-<text x="724" y="168" class="val" text-anchor="start">from RED / 12 V</text>
-<polyline class="w" points="655,196 655,214"/>
-<polyline class="w" points="655,214 655,223"/><line class="w" x1="645" y1="223" x2="665" y2="223"/><line class="w" x1="649" y1="227" x2="661" y2="227"/><line class="w" x1="652.5" y1="231" x2="657.5" y2="231"/>
+<rect class="c" x="588" y="143" width="134" height="58"/>
+<text x="655.0" y="169" class="lbl" text-anchor="middle">3.3 V regulator</text>
+<text x="655.0" y="187" class="val" text-anchor="middle">(LDO or buck)</text>
+<text x="594" y="157" class="val" text-anchor="start">OUT</text>
+<text x="716" y="157" class="val" text-anchor="end">IN</text>
+<polyline class="w" points="722,172 770,172 770,255"/>
+<text x="746" y="188" class="val" text-anchor="start">from RED / ~12 V</text>
+<polyline class="w" points="655.0,201 655.0,216"/>
+<polyline class="w" points="655.0,216 655.0,225"/><line class="w" x1="645.0" y1="225" x2="665.0" y2="225"/><line class="w" x1="649.0" y1="229" x2="661.0" y2="229"/><line class="w" x1="652.5" y1="233" x2="657.5" y2="233"/>
+<text x="667.0" y="213" class="val" text-anchor="start">GND</text>
 <line class="w" x1="620" y1="290" x2="620" y2="330"/><line class="w" x1="610" y1="290" x2="610" y2="330"/><polyline class="w" points="610,310 584,310"/><polyline class="w" points="620,290 642,290 642,274"/><polyline class="w" points="620,330 642,330 642,346"/>
 <text x="620" y="300" class="val" text-anchor="middle">Q1</text>
 <polyline class="w" points="486,310 540,310 584,310"/>

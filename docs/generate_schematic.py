@@ -251,14 +251,23 @@ def build_isolated():
     # opener Vcc rail, sourced by a regulator that taps the RED / ~12 V line
     # (referenced to opener GND) — the only power available on the opener side.
     s.append(wire((u1p["C"][0], 270), (u1p["C"][0], vcc_y)))     # U1 collector up to rail
-    s.append(wire((u1p["C"][0], vcc_y), (595, vcc_y)))           # Vcc rail
+    s.append(wire((u1p["C"][0], vcc_y), (588, vcc_y)))           # Vcc rail -> regulator OUT
     s.append(dot(u1p["C"][0], vcc_y))
     s.append(text(u1p["C"][0] + 6, vcc_y - 7, "opener Vcc", "val"))
-    s.append(block(595, 150, 120, 46, "12 V -> Vcc"))           # regulator
-    s.append(wire((715, vcc_y), (busx, vcc_y), (busx, 255)))    # input taps RED / 12 V
-    s.append(text(724, vcc_y - 4, "from RED / 12 V", "val"))
-    s.append(wire((655, 196), (655, 214)))                       # regulator ground
-    s.append(gnd(655, 214))
+    # Voltage regulator (solid box = a real component): RED/~12 V in, Vcc out,
+    # referenced to opener GND. This is what makes the opener-side supply.
+    rx0, rw, rh = 588, 134, 58
+    ry0 = vcc_y - 29
+    s.append(f'<rect class="c" x="{rx0}" y="{ry0}" width="{rw}" height="{rh}"/>')
+    s.append(text(rx0 + rw / 2, vcc_y - 3, "3.3 V regulator", "lbl", "middle"))
+    s.append(text(rx0 + rw / 2, vcc_y + 15, "(LDO or buck)", "val", "middle"))
+    s.append(text(rx0 + 6, ry0 + 14, "OUT", "val", "start"))
+    s.append(text(rx0 + rw - 6, ry0 + 14, "IN", "val", "end"))
+    s.append(wire((rx0 + rw, vcc_y), (busx, vcc_y), (busx, 255)))  # IN taps RED / ~12 V
+    s.append(text(rx0 + rw + 24, vcc_y + 16, "from RED / ~12 V", "val", "start"))
+    s.append(wire((rx0 + rw / 2, ry0 + rh), (rx0 + rw / 2, ry0 + rh + 15)))  # GND lead
+    s.append(gnd(rx0 + rw / 2, ry0 + rh + 15))
+    s.append(text(rx0 + rw / 2 + 12, ry0 + rh + 12, "GND", "val", "start"))
 
     # TX MOSFET Q1: gate <- TX opto emitter (+ pulldown); drain -> DATA; source -> GND
     q1, q1p = nmos(620, 310, "L")   # G=(584,310) D=(642,274) S=(642,346)
