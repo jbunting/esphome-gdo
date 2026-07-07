@@ -196,10 +196,11 @@ def build(obst):
 
 
 def build_isolated():
-    """Illustrative galvanic-isolation of one opener channel: the ESP domain and
-    the opener domain are bridged only by optocouplers (signals) — never by a
-    shared ground. Representative, not a verified netlist."""
-    IW, IH, bar = 1020, 560, 470
+    """Illustrative galvanic-isolation of one opener channel with the opener-side
+    MOSFET front end inlined. ESP and opener domains are bridged only by
+    optocouplers (signals) — never by a shared ground. Representative, not a
+    verified netlist."""
+    IW, IH, bar = 1090, 650, 420
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {IW} {IH}" '
          'font-family="Helvetica,Arial,sans-serif">',
          '<style>.w{stroke:#111;stroke-width:2;fill:none}.c{stroke:#111;stroke-width:2;fill:#fff}'
@@ -208,75 +209,92 @@ def build_isolated():
          f'<rect width="{IW}" height="{IH}" fill="#fff"/>',
          text(24, 34, "Isolated opener channel (repeat this per opener)", "big")]
 
-    # isolation barrier (behind everything)
-    s.append(f'<line x1="{bar}" y1="95" x2="{bar}" y2="500" stroke="#c53030" stroke-width="1.5" stroke-dasharray="6 5"/>')
+    s.append(f'<line x1="{bar}" y1="95" x2="{bar}" y2="590" stroke="#c53030" stroke-width="1.5" stroke-dasharray="6 5"/>')
     s.append(text(bar, 88, "galvanic isolation", "val", "middle"))
-    s.append(text(bar, 522, "ESP GND and opener GND are NOT connected", "val", "middle"))
-    s.append(text(250, 118, "ESP domain (shared)", "val", "middle"))
-    s.append(text(700, 118, "opener domain (floating, one per opener)", "val", "middle"))
+    s.append(text(bar, 612, "ESP GND (left) and opener GND (right) are separate — no ground crosses the barrier", "val", "middle"))
+    s.append(text(215, 128, "ESP domain (shared)", "val", "middle"))
+    s.append(text(800, 128, "opener domain (floating, one per opener)", "val", "middle"))
 
     # ESP domain
-    s.append('<rect x="30" y="140" width="150" height="255" rx="6" fill="#eaf2ff" stroke="#2b6cb0" stroke-width="2"/>')
-    s.append(text(105, 168, "ESP32", "big", "middle"))
-    stub = 230
-    for name, y in {"3V3": 175, "tx_pin": 235, "rx_pin": 320, "GND": 375}.items():
-        s.append(text(172, y + 4, name, "val", "end"))
+    s.append('<rect x="30" y="175" width="150" height="255" rx="6" fill="#eaf2ff" stroke="#2b6cb0" stroke-width="2"/>')
+    s.append(text(105, 203, "ESP32", "big", "middle"))
+    stub = 200
+    for name, y in {"3V3": 210, "tx_pin": 270, "rx_pin": 390, "GND": 415}.items():
+        s.append(text(192, y + 4, name, "val", "end"))
         s.append(wire((180, y), (stub, y)))
         s.append(dot(stub, y))
-    s.append(wire((stub, 375), (285, 375)))
-    s.append(gnd(285, 375))
-    s.append(text(305, 388, "ESP GND", "val"))
+    s.append(wire((stub, 415), (255, 415)))
+    s.append(gnd(255, 415))
+    s.append(text(275, 428, "ESP GND", "val"))
 
-    # TX opto: LED on ESP side, aligned so anode == tx_pin height
-    u1, u1p = opto(bar, 255, "L")            # A=(404,235) K=(404,275) C=(536,235) E=(536,275)
-    s.append(res(stub, 235, u1p["A"][0], 235, "10k"))
+    # TX opto (LED on ESP side)
+    u1, u1p = opto(bar, 290, "L")   # A=(354,270) K=(354,310) C=(486,270) E=(486,310)
+    s.append(res(stub, 270, u1p["A"][0], 270, "10k"))
     s.append(u1)
-    s.append(text(bar, 200, "opto (TX)", "val", "middle"))
-    s.append(wire(u1p["K"], (u1p["K"][0], 300)))
-    s.append(gnd(u1p["K"][0], 300))
+    s.append(text(bar, 236, "opto (TX)", "val", "middle"))
+    s.append(wire(u1p["K"], (u1p["K"][0], 340)))
+    s.append(gnd(u1p["K"][0], 340))
 
-    # RX opto: transistor on ESP side, collector == rx_pin height
-    u2, u2p = opto(bar, 340, "R")            # A=(536,320) K=(536,360) C=(404,320) E=(404,360)
+    # RX opto (LED on opener side)
+    u2, u2p = opto(bar, 410, "R")   # A=(486,390) K=(486,430) C=(354,390) E=(354,430)
     s.append(u2)
-    s.append(text(bar, 405, "opto (RX)", "val", "middle"))
-    s.append(wire(u2p["C"], (stub, 320)))    # collector -> rx_pin
-    s.append(dot(270, 320))
-    s.append(res(270, 320, 270, 215, "10k")) # pull-up to 3V3 (own lane; crosses TX wire, no dot)
-    s.append(wire((270, 215), (270, 175), (stub, 175)))
-    s.append(wire(u2p["E"], (u2p["E"][0], 385)))
-    s.append(gnd(u2p["E"][0], 385))
+    s.append(text(bar, 470, "opto (RX)", "val", "middle"))
+    s.append(wire(u2p["C"], (stub, 390)))
+    s.append(dot(250, 390))
+    s.append(res(250, 390, 250, 250, "10k"))
+    s.append(wire((250, 250), (250, 210), (stub, 210)))
+    s.append(wire(u2p["E"], (u2p["E"][0], 460)))
+    s.append(gnd(u2p["E"][0], 460))
 
-    # Opener-side interface block
-    bx, by, bw, bh = 590, 185, 195, 245
-    s.append(block(bx, by, bw, bh, "Opener-side interface"))
-    for i, t in enumerate(["MOSFET TX / RX", "front end,", "12 V -> Vcc", "(see schematic above)"]):
-        s.append(text(bx + bw / 2, by + 110 + i * 18, t, "val", "middle"))
-    s.append(wire(u1p["E"], (bx, u1p["E"][1])))          # TX in
-    s.append(text(bx + 6, u1p["E"][1] + 4, "TX", "val"))
-    s.append(res(bx, u2p["A"][1], u2p["A"][0], u2p["A"][1], "10k"))  # RX out -> opto LED
-    s.append(text(bx + 6, u2p["A"][1] + 4, "RX", "val"))
-    # opener Vcc rail (from 12 V, inside opener domain)
-    s.append(wire((bx + 95, by), (bx + 95, 150), (u1p["C"][0], 150), u1p["C"]))
-    s.append(dot(bx + 95, 150))
-    s.append(text(bx + 105, 146, "opener Vcc (from 12 V)", "val"))
+    # --- opener-side front end (inlined) ---
+    vcc_y, busx = 225, 770
+    # opener Vcc rail (regulated from the RED/12 V line)
+    s.append(wire((u1p["C"][0], 270), (u1p["C"][0], vcc_y), (600, vcc_y)))
+    s.append(dot(u1p["C"][0], vcc_y))
+    s.append(text(u1p["C"][0] + 4, vcc_y - 8, "opener Vcc (regulated from RED / 12 V)", "val"))
 
-    # Opener box (drawn before the wires/grounds/terminals that sit on it)
-    s.append('<rect x="820" y="195" width="180" height="230" rx="6" fill="#fff5f5" '
+    # TX MOSFET Q1: gate <- TX opto emitter (+ pulldown); drain -> DATA; source -> GND
+    q1, q1p = nmos(620, 310, "L")   # G=(584,310) D=(642,274) S=(642,346)
+    s.append(q1)
+    s.append(text(620, 300, "Q1", "val", "middle"))
+    s.append(wire(u1p["E"], (540, 310), q1p["G"]))
+    s.append(dot(540, 310))
+    s.append(res(540, 310, 540, 372, "10k"))
+    s.append(gnd(540, 372))
+    s.append(wire(q1p["D"], (q1p["D"][0], 255), (busx, 255)))
+    s.append(gnd(*q1p["S"]))
+
+    # RX MOSFET Q2: gate <- DATA; drain -> RX opto LED cathode; LED anode <- R <- Vcc
+    q2, q2p = nmos(620, 430, "R")   # G=(656,430) D=(598,394) S=(598,466)
+    s.append(q2)
+    s.append(text(620, 420, "Q2", "val", "middle"))
+    s.append(res(q2p["G"][0], 430, busx, 430, "10k"))
+    s.append(wire(q2p["D"], (q2p["D"][0], 430), u2p["K"]))       # drain -> LED cathode
+    s.append(res(u2p["A"][0], 390, 560, 390, "10k"))            # LED anode <- R <- Vcc
+    s.append(wire((560, 390), (560, vcc_y)))
+    s.append(dot(560, vcc_y))
+    s.append(gnd(*q2p["S"]))
+
+    # DATA bus -> RED, with opener internal ~12 V idle pull-up
+    s.append(wire((busx, 255), (busx, 430)))
+    s.append(dot(busx, 255))
+    s.append(dot(busx, 430))
+    s.append(text(busx - 6, 300, "DATA (~12 V idle)", "val", "end"))
+
+    # Opener box
+    s.append('<rect x="820" y="220" width="200" height="300" rx="6" fill="#fff5f5" '
              'stroke="#c53030" stroke-width="2" stroke-dasharray="7 5"/>')
-    s.append(text(832, 219, "Opener", "lbl"))
-
-    # DATA -> RED, GND -> WHITE
-    s.append(wire((bx + bw, 235), (820, 235)))
-    s.append(wire((bx + bw, 380), (820, 380)))
-    # opener-side grounds (common opener GND; not tied to ESP GND)
-    s.append(wire((820, 380), (820, 410)))
-    s.append(gnd(820, 410))
-    s.append(text(840, 423, "opener GND", "val"))
-    s.append(wire(u2p["K"], (u2p["K"][0], 430)))
-    s.append(gnd(u2p["K"][0], 430))
-
-    s.append(terminal(820, 235, "RED (data)", "#e53e3e", ldy=20))
-    s.append(terminal(820, 380, "WHITE (gnd)", "#eeeeee", ldy=-12))
+    s.append(text(832, 244, "Opener", "lbl"))
+    s.append(wire((busx, 255), (820, 255)))
+    s.append(terminal(820, 255, "RED (data)", "#e53e3e", ldy=20))
+    s.append(wire((820, 255), (935, 255)))
+    s.append(dot(935, 255))
+    s.append(res(935, 255, 935, 210, "~12 V"))
+    s.append(supply(935, 210, "+12 V (internal)"))
+    s.append(terminal(820, 470, "WHITE (gnd)", "#eeeeee", ldy=-12))
+    s.append(wire((820, 470), (795, 470)))
+    s.append(gnd(795, 470))
+    s.append(text(700, 500, "opener GND (every ground right of the barrier)", "val"))
     s.append('</svg>')
     return "\n".join(s)
 

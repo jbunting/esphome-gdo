@@ -104,8 +104,8 @@ the issue by construction.)
 ![Isolated opener channel schematic](schematic-isolated.svg)
 
 *One isolated channel — repeat per opener; only the ESP side is shared.
-Representative (verify your optocoupler/regulator choices); the opener-side
-MOSFET front end is the one from the [schematic above](#schematic).*
+Representative/illustrative — choose and verify real optocoupler / MOSFET /
+regulator parts; this is not a proven netlist.*
 
 Alternatives:
 
