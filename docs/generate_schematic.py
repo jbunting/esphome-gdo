@@ -73,6 +73,42 @@ def terminal(x, y, label, color, ldy=4):
             + text(x + 13, y + ldy, label, "lbl", "start"))
 
 
+def opto(cx, cy, led):
+    """Optocoupler straddling the isolation barrier at x=cx. led='L' puts the
+    LED (input) on the left/ESP side, 'R' puts it on the right/opener side.
+    Returns (svg, pins) with pins A/K (LED anode/cathode) and C/E (transistor
+    collector/emitter)."""
+    x0, y0, w, h = cx - 66, cy - 42, 132, 84
+    p = [f'<rect class="c" x="{x0}" y="{y0}" width="{w}" height="{h}" rx="4" fill="#fafafa"/>',
+         f'<line x1="{cx}" y1="{y0}" x2="{cx}" y2="{y0+h}" stroke="#c53030" stroke-width="1.3" stroke-dasharray="4 3"/>']
+    lx = cx - 38  # LED column
+    tx = cx + 38  # transistor column
+    if led == "R":
+        lx, tx = tx, lx
+    # LED (diode triangle + bar), vertical between top/bottom pins
+    top, bot = cy - 20, cy + 20
+    lpx = x0 if led == "L" else x0 + w
+    p += [wire((lpx, top), (lx, top), (lx, cy - 9)),
+          f'<polygon class="c" points="{lx-11},{cy-9} {lx+11},{cy-9} {lx},{cy+7}"/>',
+          f'<line class="w" x1="{lx-11}" y1="{cy+7}" x2="{lx+11}" y2="{cy+7}"/>',
+          wire((lx, cy + 7), (lx, bot), (lpx, bot))]
+    # emission arrows toward transistor
+    ax = 1 if led == "L" else -1
+    p += [f'<line class="w" x1="{lx+ax*13}" y1="{cy-4}" x2="{lx+ax*24}" y2="{cy-4}"/>',
+          f'<line class="w" x1="{lx+ax*13}" y1="{cy+4}" x2="{lx+ax*24}" y2="{cy+4}"/>']
+    # phototransistor: circle with collector (top) / emitter (bottom)
+    tpx = x0 + w if led == "L" else x0
+    p += [f'<circle class="c" cx="{tx}" cy="{cy}" r="15" fill="#fff"/>',
+          wire((tpx, top), (tx + (-15 if led == "L" else 15), top), (tx, cy - 14)),
+          wire((tpx, bot), (tx + (-15 if led == "L" else 15), bot), (tx, cy + 14)),
+          f'<line class="w" x1="{tx-6}" y1="{cy-11}" x2="{tx-6}" y2="{cy+11}"/>']
+    A = (lpx, top)
+    K = (lpx, bot)
+    C = (tpx, top)
+    E = (tpx, bot)
+    return "".join(p), {"A": A, "K": K, "C": C, "E": E}
+
+
 def block(x, y, w, h, title):
     return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="#fafafa" '
             f'stroke="#999" stroke-width="1.5" stroke-dasharray="4 3"/>'
@@ -159,8 +195,97 @@ def build(obst):
     return "\n".join(s)
 
 
+def build_isolated():
+    """Illustrative galvanic-isolation of one opener channel: the ESP domain and
+    the opener domain are bridged only by optocouplers (signals) — never by a
+    shared ground. Representative, not a verified netlist."""
+    IW, IH, bar = 1020, 560, 470
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {IW} {IH}" '
+         'font-family="Helvetica,Arial,sans-serif">',
+         '<style>.w{stroke:#111;stroke-width:2;fill:none}.c{stroke:#111;stroke-width:2;fill:#fff}'
+         '.lbl{font-size:13px;fill:#111}.val{font-size:12px;fill:#444}'
+         '.big{font-size:18px;font-weight:bold;fill:#111}</style>',
+         f'<rect width="{IW}" height="{IH}" fill="#fff"/>',
+         text(24, 34, "Isolated opener channel (repeat this per opener)", "big")]
+
+    # isolation barrier (behind everything)
+    s.append(f'<line x1="{bar}" y1="95" x2="{bar}" y2="500" stroke="#c53030" stroke-width="1.5" stroke-dasharray="6 5"/>')
+    s.append(text(bar, 88, "galvanic isolation", "val", "middle"))
+    s.append(text(bar, 522, "ESP GND and opener GND are NOT connected", "val", "middle"))
+    s.append(text(250, 118, "ESP domain (shared)", "val", "middle"))
+    s.append(text(700, 118, "opener domain (floating, one per opener)", "val", "middle"))
+
+    # ESP domain
+    s.append('<rect x="30" y="140" width="150" height="255" rx="6" fill="#eaf2ff" stroke="#2b6cb0" stroke-width="2"/>')
+    s.append(text(105, 168, "ESP32", "big", "middle"))
+    stub = 230
+    for name, y in {"3V3": 175, "tx_pin": 235, "rx_pin": 320, "GND": 375}.items():
+        s.append(text(172, y + 4, name, "val", "end"))
+        s.append(wire((180, y), (stub, y)))
+        s.append(dot(stub, y))
+    s.append(wire((stub, 375), (285, 375)))
+    s.append(gnd(285, 375))
+    s.append(text(305, 388, "ESP GND", "val"))
+
+    # TX opto: LED on ESP side, aligned so anode == tx_pin height
+    u1, u1p = opto(bar, 255, "L")            # A=(404,235) K=(404,275) C=(536,235) E=(536,275)
+    s.append(res(stub, 235, u1p["A"][0], 235, "10k"))
+    s.append(u1)
+    s.append(text(bar, 200, "opto (TX)", "val", "middle"))
+    s.append(wire(u1p["K"], (u1p["K"][0], 300)))
+    s.append(gnd(u1p["K"][0], 300))
+
+    # RX opto: transistor on ESP side, collector == rx_pin height
+    u2, u2p = opto(bar, 340, "R")            # A=(536,320) K=(536,360) C=(404,320) E=(404,360)
+    s.append(u2)
+    s.append(text(bar, 405, "opto (RX)", "val", "middle"))
+    s.append(wire(u2p["C"], (stub, 320)))    # collector -> rx_pin
+    s.append(dot(270, 320))
+    s.append(res(270, 320, 270, 215, "10k")) # pull-up to 3V3 (own lane; crosses TX wire, no dot)
+    s.append(wire((270, 215), (270, 175), (stub, 175)))
+    s.append(wire(u2p["E"], (u2p["E"][0], 385)))
+    s.append(gnd(u2p["E"][0], 385))
+
+    # Opener-side interface block
+    bx, by, bw, bh = 590, 185, 195, 245
+    s.append(block(bx, by, bw, bh, "Opener-side interface"))
+    for i, t in enumerate(["MOSFET TX / RX", "front end,", "12 V -> Vcc", "(see schematic above)"]):
+        s.append(text(bx + bw / 2, by + 110 + i * 18, t, "val", "middle"))
+    s.append(wire(u1p["E"], (bx, u1p["E"][1])))          # TX in
+    s.append(text(bx + 6, u1p["E"][1] + 4, "TX", "val"))
+    s.append(res(bx, u2p["A"][1], u2p["A"][0], u2p["A"][1], "10k"))  # RX out -> opto LED
+    s.append(text(bx + 6, u2p["A"][1] + 4, "RX", "val"))
+    # opener Vcc rail (from 12 V, inside opener domain)
+    s.append(wire((bx + 95, by), (bx + 95, 150), (u1p["C"][0], 150), u1p["C"]))
+    s.append(dot(bx + 95, 150))
+    s.append(text(bx + 105, 146, "opener Vcc (from 12 V)", "val"))
+
+    # Opener box (drawn before the wires/grounds/terminals that sit on it)
+    s.append('<rect x="820" y="195" width="180" height="230" rx="6" fill="#fff5f5" '
+             'stroke="#c53030" stroke-width="2" stroke-dasharray="7 5"/>')
+    s.append(text(832, 219, "Opener", "lbl"))
+
+    # DATA -> RED, GND -> WHITE
+    s.append(wire((bx + bw, 235), (820, 235)))
+    s.append(wire((bx + bw, 380), (820, 380)))
+    # opener-side grounds (common opener GND; not tied to ESP GND)
+    s.append(wire((820, 380), (820, 410)))
+    s.append(gnd(820, 410))
+    s.append(text(840, 423, "opener GND", "val"))
+    s.append(wire(u2p["K"], (u2p["K"][0], 430)))
+    s.append(gnd(u2p["K"][0], 430))
+
+    s.append(terminal(820, 235, "RED (data)", "#e53e3e", ldy=20))
+    s.append(terminal(820, 380, "WHITE (gnd)", "#eeeeee", ldy=-12))
+    s.append('</svg>')
+    return "\n".join(s)
+
+
 outdir = os.path.dirname(os.path.abspath(__file__))
-for name, o in [("schematic.svg", True), ("schematic-no-obstruction.svg", False)]:
+jobs = [("schematic.svg", lambda: build(True)),
+        ("schematic-no-obstruction.svg", lambda: build(False)),
+        ("schematic-isolated.svg", build_isolated)]
+for name, fn in jobs:
     with open(os.path.join(outdir, name), "w") as f:
-        f.write(build(o))
+        f.write(fn())
     print("wrote", name)

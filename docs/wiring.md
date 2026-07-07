@@ -94,10 +94,18 @@ How much of a problem this is depends on the installation:
   → worst case, damaging circulating current through traces not built for it.
 
 **Recommended: isolate each opener channel.** Put optoisolators (or a digital
-isolator) on that channel's TX/RX and power its interface side from an **isolated
-DC-DC converter**, so each opener keeps its own floating ground and nothing is
-bridged. (This is why single-opener boards like ratgdo simply power the ESP from
-that one opener — a single ground domain avoids the issue by construction.)
+isolator) on that channel's TX/RX so only signals cross the barrier, and power
+the opener-side interface from **that opener's own 12 V** (a local regulator) —
+or from an **isolated DC-DC converter**. Either way each opener keeps its own
+floating ground and nothing is bridged. (This is why single-opener boards like
+ratgdo simply power the ESP from that one opener — a single ground domain avoids
+the issue by construction.)
+
+![Isolated opener channel schematic](schematic-isolated.svg)
+
+*One isolated channel — repeat per opener; only the ESP side is shared.
+Representative (verify your optocoupler/regulator choices); the opener-side
+MOSFET front end is the one from the [schematic above](#schematic).*
 
 Alternatives:
 

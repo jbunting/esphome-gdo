@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 560" font-family="Helvetica,Arial,sans-serif">
+<style>.w{stroke:#111;stroke-width:2;fill:none}.c{stroke:#111;stroke-width:2;fill:#fff}.lbl{font-size:13px;fill:#111}.val{font-size:12px;fill:#444}.big{font-size:18px;font-weight:bold;fill:#111}</style>
+<rect width="1020" height="560" fill="#fff"/>
+<text x="24" y="34" class="big" text-anchor="start">Isolated opener channel (repeat this per opener)</text>
+<line x1="470" y1="95" x2="470" y2="500" stroke="#c53030" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="470" y="88" class="val" text-anchor="middle">galvanic isolation</text>
+<text x="470" y="522" class="val" text-anchor="middle">ESP GND and opener GND are NOT connected</text>
+<text x="250" y="118" class="val" text-anchor="middle">ESP domain (shared)</text>
+<text x="700" y="118" class="val" text-anchor="middle">opener domain (floating, one per opener)</text>
+<rect x="30" y="140" width="150" height="255" rx="6" fill="#eaf2ff" stroke="#2b6cb0" stroke-width="2"/>
+<text x="105" y="168" class="big" text-anchor="middle">ESP32</text>
+<text x="172" y="179" class="val" text-anchor="end">3V3</text>
+<polyline class="w" points="180,175 230,175"/>
+<circle cx="230" cy="175" r="3.6" fill="#111"/>
+<text x="172" y="239" class="val" text-anchor="end">tx_pin</text>
+<polyline class="w" points="180,235 230,235"/>
+<circle cx="230" cy="235" r="3.6" fill="#111"/>
+<text x="172" y="324" class="val" text-anchor="end">rx_pin</text>
+<polyline class="w" points="180,320 230,320"/>
+<circle cx="230" cy="320" r="3.6" fill="#111"/>
+<text x="172" y="379" class="val" text-anchor="end">GND</text>
+<polyline class="w" points="180,375 230,375"/>
+<circle cx="230" cy="375" r="3.6" fill="#111"/>
+<polyline class="w" points="230,375 285,375"/>
+<polyline class="w" points="285,375 285,384"/><line class="w" x1="275" y1="384" x2="295" y2="384"/><line class="w" x1="279" y1="388" x2="291" y2="388"/><line class="w" x1="282.5" y1="392" x2="287.5" y2="392"/>
+<text x="305" y="388" class="val" text-anchor="start">ESP GND</text>
+<polyline class="w" points="230,235 295.0,235"/><polyline class="w" points="339.0,235 404,235"/><rect class="c" x="295.0" y="227" width="44" height="16"/><text x="317.0" y="256" class="val" text-anchor="middle">10k</text>
+<rect class="c" x="404" y="213" width="132" height="84" rx="4" fill="#fafafa"/><line x1="470" y1="213" x2="470" y2="297" stroke="#c53030" stroke-width="1.3" stroke-dasharray="4 3"/><polyline class="w" points="404,235 432,235 432,246"/><polygon class="c" points="421,246 443,246 432,262"/><line class="w" x1="421" y1="262" x2="443" y2="262"/><polyline class="w" points="432,262 432,275 404,275"/><line class="w" x1="445" y1="251" x2="456" y2="251"/><line class="w" x1="445" y1="259" x2="456" y2="259"/><circle class="c" cx="508" cy="255" r="15" fill="#fff"/><polyline class="w" points="536,235 493,235 508,241"/><polyline class="w" points="536,275 493,275 508,269"/><line class="w" x1="502" y1="244" x2="502" y2="266"/>
+<text x="470" y="200" class="val" text-anchor="middle">opto (TX)</text>
+<polyline class="w" points="404,275 404,300"/>
+<polyline class="w" points="404,300 404,309"/><line class="w" x1="394" y1="309" x2="414" y2="309"/><line class="w" x1="398" y1="313" x2="410" y2="313"/><line class="w" x1="401.5" y1="317" x2="406.5" y2="317"/>
+<rect class="c" x="404" y="298" width="132" height="84" rx="4" fill="#fafafa"/><line x1="470" y1="298" x2="470" y2="382" stroke="#c53030" stroke-width="1.3" stroke-dasharray="4 3"/><polyline class="w" points="536,320 508,320 508,331"/><polygon class="c" points="497,331 519,331 508,347"/><line class="w" x1="497" y1="347" x2="519" y2="347"/><polyline class="w" points="508,347 508,360 536,360"/><line class="w" x1="495" y1="336" x2="484" y2="336"/><line class="w" x1="495" y1="344" x2="484" y2="344"/><circle class="c" cx="432" cy="340" r="15" fill="#fff"/><polyline class="w" points="404,320 447,320 432,326"/><polyline class="w" points="404,360 447,360 432,354"/><line class="w" x1="426" y1="329" x2="426" y2="351"/>
+<text x="470" y="405" class="val" text-anchor="middle">opto (RX)</text>
+<polyline class="w" points="404,320 230,320"/>
+<circle cx="270" cy="320" r="3.6" fill="#111"/>
+<polyline class="w" points="270,320 270,245.5"/><polyline class="w" points="270,289.5 270,215"/><rect class="c" x="262" y="245.5" width="16" height="44"/><text x="283" y="271.5" class="val" text-anchor="start">10k</text>
+<polyline class="w" points="270,215 270,175 230,175"/>
+<polyline class="w" points="404,360 404,385"/>
+<polyline class="w" points="404,385 404,394"/><line class="w" x1="394" y1="394" x2="414" y2="394"/><line class="w" x1="398" y1="398" x2="410" y2="398"/><line class="w" x1="401.5" y1="402" x2="406.5" y2="402"/>
+<rect x="590" y="185" width="195" height="245" rx="6" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="4 3"/><text x="600" y="203" class="val" text-anchor="start">Opener-side interface</text>
+<text x="687.5" y="295" class="val" text-anchor="middle">MOSFET TX / RX</text>
+<text x="687.5" y="313" class="val" text-anchor="middle">front end,</text>
+<text x="687.5" y="331" class="val" text-anchor="middle">12 V -&gt; Vcc</text>
+<text x="687.5" y="349" class="val" text-anchor="middle">(see schematic above)</text>
+<polyline class="w" points="536,275 590,275"/>
+<text x="596" y="279" class="val" text-anchor="start">TX</text>
+<polyline class="w" points="590,320 541.0,320"/><polyline class="w" points="585.0,320 536,320"/><rect class="c" x="541.0" y="312" width="44" height="16"/><text x="563.0" y="341" class="val" text-anchor="middle">10k</text>
+<text x="596" y="324" class="val" text-anchor="start">RX</text>
+<polyline class="w" points="685,185 685,150 536,150 536,235"/>
+<circle cx="685" cy="150" r="3.6" fill="#111"/>
+<text x="695" y="146" class="val" text-anchor="start">opener Vcc (from 12 V)</text>
+<rect x="820" y="195" width="180" height="230" rx="6" fill="#fff5f5" stroke="#c53030" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="832" y="219" class="lbl" text-anchor="start">Opener</text>
+<polyline class="w" points="785,235 820,235"/>
+<polyline class="w" points="785,380 820,380"/>
+<polyline class="w" points="820,380 820,410"/>
+<polyline class="w" points="820,410 820,419"/><line class="w" x1="810" y1="419" x2="830" y2="419"/><line class="w" x1="814" y1="423" x2="826" y2="423"/><line class="w" x1="817.5" y1="427" x2="822.5" y2="427"/>
+<text x="840" y="423" class="val" text-anchor="start">opener GND</text>
+<polyline class="w" points="536,360 536,430"/>
+<polyline class="w" points="536,430 536,439"/><line class="w" x1="526" y1="439" x2="546" y2="439"/><line class="w" x1="530" y1="443" x2="542" y2="443"/><line class="w" x1="533.5" y1="447" x2="538.5" y2="447"/>
+<circle cx="820" cy="235" r="6" fill="#e53e3e" stroke="#111" stroke-width="1.5"/><text x="833" y="255" class="lbl" text-anchor="start">RED (data)</text>
+<circle cx="820" cy="380" r="6" fill="#eeeeee" stroke="#111" stroke-width="1.5"/><text x="833" y="368" class="lbl" text-anchor="start">WHITE (gnd)</text>
+</svg>
