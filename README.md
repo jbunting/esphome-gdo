@@ -19,6 +19,14 @@ on one board** — declare one `secplus_gdo` hub per UART port.
   blaQ or an equivalent level-shifter). If your interface inverts the UART, set
   `invert_uart: true`.
 
+## Wiring
+
+The ESP32 can't drive the opener's ~12 V wall-control bus directly — it connects
+through a level-shifting MOSFET front end. See **[docs/wiring.md](docs/wiring.md)**
+for the circuit diagram, opener terminal mapping, and how it maps to config. In
+short: `tx_pin`/`rx_pin` reach the opener's single data line through an inverting
+interface, so `invert_uart: true` is required.
+
 ## Installation
 
 ```yaml
