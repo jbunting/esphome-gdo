@@ -1,11 +1,18 @@
 name: Release
 
-# Auto-releases on every merge to main, plus a manual trigger. There is no
+# Auto-releases after CI succeeds on main, plus a manual trigger. There is no
 # binary to publish — this is a source-consumed ESPHome external component — so a
 # "release" is a git tag plus a GitHub Release (GitHub attaches the source
 # archive). Consumers pin a version:  github://jbunting/esphome-gdo@2026.7.0
+#
+# Gating on CI (via workflow_run) means broken commits are never released.
+# Because CI cancels superseded runs on main, a burst of merges collapses into a
+# single successful CI run and therefore a single release — no explicit debounce
+# needed.
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
     inputs:
@@ -21,34 +28,47 @@ on:
 permissions:
   contents: write
 
-# Debounce: all release runs share one group and a newer run cancels the older
-# one. Combined with the sleep below, a burst of merges collapses into a single
-# release once things go quiet for DEBOUNCE_SECONDS.
 concurrency:
   group: release
   cancel-in-progress: true
 
-env:
-  DEBOUNCE_SECONDS: "300"
-
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Only after a successful CI run, or a manual dispatch.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
-      - name: Debounce merge bursts
-        if: github.event_name == 'push'
-        # If another commit lands on main during this wait, that run cancels
-        # this one (see the concurrency block), so only the last commit in a
-        # quiet window is released.
-        run: sleep "${DEBOUNCE_SECONDS}"
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # need full history + tags to compute the next version
+          fetch-depth: 0 # need full history + tags to compute the version / diff
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      # Skip docs-only merges: only the component sources under components/ are
+      # what consumers import, so a README/examples/tests/CI change shouldn't cut
+      # a release. Manual dispatch bypasses this check.
+      - name: Gate on component changes
+        id: gate
+        if: github.event_name == 'workflow_run'
+        run: |
+          set -euo pipefail
+          last="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          if [ -z "$last" ]; then
+            echo "No previous release tag; proceeding."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "$(git diff --name-only "$last"..HEAD -- components/)" ]; then
+            echo "components/ changed since $last; releasing."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No component changes since $last; skipping release."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Determine version
         id: ver
+        if: steps.gate.outputs.release != 'false'
         run: |
           set -euo pipefail
           version="${{ inputs.version }}"
@@ -64,6 +84,7 @@ jobs:
           echo "Releasing $version"
 
       - name: Verify tag does not exist
+        if: steps.gate.outputs.release != 'false'
         run: |
           if git rev-parse "refs/tags/${{ steps.ver.outputs.version }}" >/dev/null 2>&1; then
             echo "::error::Tag ${{ steps.ver.outputs.version }} already exists"
@@ -71,11 +92,12 @@ jobs:
           fi
 
       - name: Create release
+        if: steps.gate.outputs.release != 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${{ steps.ver.outputs.version }}" \
             --title "${{ steps.ver.outputs.version }}" \
-            --target "${{ github.sha }}" \
+            --target "${{ github.event.workflow_run.head_sha || github.sha }}" \
             --generate-notes \
             ${{ inputs.prerelease && '--prerelease' || '' }}
