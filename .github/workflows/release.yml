@@ -1,10 +1,12 @@
 name: Release
 
-# Manually cut a release. There is no binary to publish — this is a
-# source-consumed ESPHome external component — so a "release" is a git tag plus
-# a GitHub Release (GitHub attaches the source archive automatically). Consumers
-# can then pin a version:  github://jbunting/esphome-gdo@2026.7.0
+# Auto-releases on every merge to main, plus a manual trigger. There is no
+# binary to publish — this is a source-consumed ESPHome external component — so a
+# "release" is a git tag plus a GitHub Release (GitHub attaches the source
+# archive). Consumers pin a version:  github://jbunting/esphome-gdo@2026.7.0
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       version:
@@ -19,14 +21,27 @@ on:
 permissions:
   contents: write
 
+# Debounce: all release runs share one group and a newer run cancels the older
+# one. Combined with the sleep below, a burst of merges collapses into a single
+# release once things go quiet for DEBOUNCE_SECONDS.
 concurrency:
   group: release
-  cancel-in-progress: false
+  cancel-in-progress: true
+
+env:
+  DEBOUNCE_SECONDS: "300"
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Debounce merge bursts
+        if: github.event_name == 'push'
+        # If another commit lands on main during this wait, that run cancels
+        # this one (see the concurrency block), so only the last commit in a
+        # quiet window is released.
+        run: sleep "${DEBOUNCE_SECONDS}"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
