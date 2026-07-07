@@ -247,11 +247,18 @@ def build_isolated():
     s.append(gnd(u2p["E"][0], 460))
 
     # --- opener-side front end (inlined) ---
-    vcc_y, busx = 225, 770
-    # opener Vcc rail (regulated from the RED/12 V line)
-    s.append(wire((u1p["C"][0], 270), (u1p["C"][0], vcc_y), (600, vcc_y)))
+    vcc_y, busx = 172, 770
+    # opener Vcc rail, sourced by a regulator that taps the RED / ~12 V line
+    # (referenced to opener GND) — the only power available on the opener side.
+    s.append(wire((u1p["C"][0], 270), (u1p["C"][0], vcc_y)))     # U1 collector up to rail
+    s.append(wire((u1p["C"][0], vcc_y), (595, vcc_y)))           # Vcc rail
     s.append(dot(u1p["C"][0], vcc_y))
-    s.append(text(u1p["C"][0] + 4, vcc_y - 8, "opener Vcc (regulated from RED / 12 V)", "val"))
+    s.append(text(u1p["C"][0] + 6, vcc_y - 7, "opener Vcc", "val"))
+    s.append(block(595, 150, 120, 46, "12 V -> Vcc"))           # regulator
+    s.append(wire((715, vcc_y), (busx, vcc_y), (busx, 255)))    # input taps RED / 12 V
+    s.append(text(724, vcc_y - 4, "from RED / 12 V", "val"))
+    s.append(wire((655, 196), (655, 214)))                       # regulator ground
+    s.append(gnd(655, 214))
 
     # TX MOSFET Q1: gate <- TX opto emitter (+ pulldown); drain -> DATA; source -> GND
     q1, q1p = nmos(620, 310, "L")   # G=(584,310) D=(642,274) S=(642,346)

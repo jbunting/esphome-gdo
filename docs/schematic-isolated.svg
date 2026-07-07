@@ -37,9 +37,15 @@
 <polyline class="w" points="250,250 250,210 200,210"/>
 <polyline class="w" points="354,430 354,460"/>
 <polyline class="w" points="354,460 354,469"/><line class="w" x1="344" y1="469" x2="364" y2="469"/><line class="w" x1="348" y1="473" x2="360" y2="473"/><line class="w" x1="351.5" y1="477" x2="356.5" y2="477"/>
-<polyline class="w" points="486,270 486,225 600,225"/>
-<circle cx="486" cy="225" r="3.6" fill="#111"/>
-<text x="490" y="217" class="val" text-anchor="start">opener Vcc (regulated from RED / 12 V)</text>
+<polyline class="w" points="486,270 486,172"/>
+<polyline class="w" points="486,172 595,172"/>
+<circle cx="486" cy="172" r="3.6" fill="#111"/>
+<text x="492" y="165" class="val" text-anchor="start">opener Vcc</text>
+<rect x="595" y="150" width="120" height="46" rx="6" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="4 3"/><text x="605" y="168" class="val" text-anchor="start">12 V -&gt; Vcc</text>
+<polyline class="w" points="715,172 770,172 770,255"/>
+<text x="724" y="168" class="val" text-anchor="start">from RED / 12 V</text>
+<polyline class="w" points="655,196 655,214"/>
+<polyline class="w" points="655,214 655,223"/><line class="w" x1="645" y1="223" x2="665" y2="223"/><line class="w" x1="649" y1="227" x2="661" y2="227"/><line class="w" x1="652.5" y1="231" x2="657.5" y2="231"/>
 <line class="w" x1="620" y1="290" x2="620" y2="330"/><line class="w" x1="610" y1="290" x2="610" y2="330"/><polyline class="w" points="610,310 584,310"/><polyline class="w" points="620,290 642,290 642,274"/><polyline class="w" points="620,330 642,330 642,346"/>
 <text x="620" y="300" class="val" text-anchor="middle">Q1</text>
 <polyline class="w" points="486,310 540,310 584,310"/>
@@ -53,8 +59,8 @@
 <polyline class="w" points="656,430 691.0,430"/><polyline class="w" points="735.0,430 770,430"/><rect class="c" x="691.0" y="422" width="44" height="16"/><text x="713.0" y="451" class="val" text-anchor="middle">10k</text>
 <polyline class="w" points="598,394 598,430 486,430"/>
 <polyline class="w" points="486,390 501.0,390"/><polyline class="w" points="545.0,390 560,390"/><rect class="c" x="501.0" y="382" width="44" height="16"/><text x="523.0" y="411" class="val" text-anchor="middle">10k</text>
-<polyline class="w" points="560,390 560,225"/>
-<circle cx="560" cy="225" r="3.6" fill="#111"/>
+<polyline class="w" points="560,390 560,172"/>
+<circle cx="560" cy="172" r="3.6" fill="#111"/>
 <polyline class="w" points="598,466 598,475"/><line class="w" x1="588" y1="475" x2="608" y2="475"/><line class="w" x1="592" y1="479" x2="604" y2="479"/><line class="w" x1="595.5" y1="483" x2="600.5" y2="483"/>
 <polyline class="w" points="770,255 770,430"/>
 <circle cx="770" cy="255" r="3.6" fill="#111"/>
