@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs for the same ref (e.g. new pushes to a PR branch).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    name: compile ${{ matrix.config }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - example.yaml
+          - example-esp32-3-doors.yaml
+          - tests/test-minimal.yaml
+          - tests/test-all-entities.yaml
+          - tests/test-obstruction-pin.yaml
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # Shared cache of the pip download cache and the PlatformIO toolchains /
+      # ESP-IDF framework (the slow part of an ESPHome compile).
+      - name: Cache pip and PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio
+          key: esphome-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            esphome-${{ runner.os }}-
+
+      - name: Install ESPHome
+        run: pip install esphome
+
+      # The example YAMLs use !secret for WiFi; provide throwaway values so the
+      # configs compile in CI. Test configs under tests/ don't use secrets.
+      - name: Create dummy secrets
+        run: |
+          printf 'wifi_ssid: ci-test\nwifi_password: ci-test-password\n' > secrets.yaml
+
+      - name: Compile ${{ matrix.config }}
+        run: esphome compile ${{ matrix.config }}

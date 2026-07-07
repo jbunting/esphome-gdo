@@ -1,5 +1,7 @@
 # esphome-gdo
 
+[![CI](https://github.com/jbunting/esphome-gdo/actions/workflows/ci.yml/badge.svg)](https://github.com/jbunting/esphome-gdo/actions/workflows/ci.yml)
+
 An [ESPHome](https://esphome.io) external component for Chamberlain / LiftMaster
 **Security+ 1.0 and 2.0** garage door openers, built on top of
 [gdolib](https://github.com/jbunting/gdolib) (multi-instance fork).

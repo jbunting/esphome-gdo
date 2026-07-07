@@ -1,0 +1,28 @@
+# Minimal config: one opener, cover only. Regression test ensuring a config
+# that uses a SUBSET of platforms still compiles (the hub must not depend on
+# unused platform headers). No wifi/api, so no secrets are needed.
+esphome:
+  name: gdo-test-minimal
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components: [secplus_gdo]
+
+secplus_gdo:
+  - id: gdo
+    tx_pin: 17
+    rx_pin: 16
+
+cover:
+  - platform: secplus_gdo
+    name: Test Door
+    device_class: garage

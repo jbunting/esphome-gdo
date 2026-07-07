@@ -1,0 +1,98 @@
+# One opener exercising every entity type and platform in a single hub.
+# No wifi/api, so no secrets are needed.
+esphome:
+  name: gdo-test-all
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components: [secplus_gdo]
+
+secplus_gdo:
+  - id: gdo
+    tx_pin: 17
+    rx_pin: 16
+    invert_uart: true
+
+cover:
+  - platform: secplus_gdo
+    name: Door
+    device_class: garage
+
+light:
+  - platform: secplus_gdo
+    name: Light
+
+lock:
+  - platform: secplus_gdo
+    name: Lock
+
+binary_sensor:
+  - platform: secplus_gdo
+    type: motion
+    name: Motion
+    device_class: motion
+  - platform: secplus_gdo
+    type: obstruction
+    name: Obstruction
+    device_class: problem
+  - platform: secplus_gdo
+    type: motor
+    name: Motor
+    device_class: running
+  - platform: secplus_gdo
+    type: button
+    name: Wall Button
+
+sensor:
+  - platform: secplus_gdo
+    type: openings
+    name: Openings
+    state_class: total_increasing
+  - platform: secplus_gdo
+    type: time_to_close
+    name: Time To Close
+    unit_of_measurement: s
+
+switch:
+  - platform: secplus_gdo
+    type: learn
+    name: Learn
+    entity_category: config
+  - platform: secplus_gdo
+    type: toggle_only
+    name: Toggle Only
+    entity_category: config
+
+select:
+  - platform: secplus_gdo
+    name: Protocol
+    entity_category: config
+
+number:
+  - platform: secplus_gdo
+    type: open_duration
+    name: Open Duration
+    unit_of_measurement: ms
+    entity_category: config
+  - platform: secplus_gdo
+    type: close_duration
+    name: Close Duration
+    unit_of_measurement: ms
+    entity_category: config
+  - platform: secplus_gdo
+    type: client_id
+    name: Client ID
+    entity_category: config
+  - platform: secplus_gdo
+    type: rolling_code
+    name: Rolling Code
+    entity_category: config
