@@ -171,6 +171,13 @@ ESP32 variants expose 1–3 hardware UARTs; UART0 is normally the logger console
 so a classic ESP32 can drive up to two openers alongside logging (or three if
 you free UART0).
 
+> [!IMPORTANT]
+> Driving multiple openers from one board is a firmware feature, not a wiring
+> one. Each opener is a separate power/ground domain, so tying their grounds
+> together through one ESP32 can create a ground loop. Isolate each channel (or
+> use one ESP per opener) — see
+> [Multiple openers: grounding and isolation](docs/wiring.md#multiple-openers-grounding-and-isolation).
+
 See [`example.yaml`](example.yaml) for a complete two-opener configuration.
 
 ## Status

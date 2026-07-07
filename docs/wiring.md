@@ -70,6 +70,44 @@ Either power the ESP32 separately (USB), or step the 12 V line down with a buck
 converter to 5 V/3.3 V (ready-made ratgdo boards include this). Share a common
 ground (opener WHITE ↔ ESP32 GND).
 
+## Multiple openers: grounding and isolation
+
+> [!WARNING]
+> Driving several openers from one ESP32 (`MULTI_CONF`) is a software feature —
+> it does **not** make the wiring safe on its own. Each opener is a separately
+> powered appliance with its **own ground domain**, and tying them together
+> through one ESP can create a ground loop.
+
+The DATA line is referenced to each opener's ground, so the ESP's GND *must* be
+common with each opener's WHITE for signaling to work. But once two openers'
+grounds are both bridged to the shared ESP GND, any potential difference between
+them drives current through the ESP's ground wiring.
+
+How much of a problem this is depends on the installation:
+
+- **Same breaker / phase, earth-referenced supplies** — the difference is small;
+  usually fine, but not guaranteed.
+- **Different circuits, opposite legs of a split-phase panel, or supplies that
+  float independently** — the difference can be volts and varies with each
+  opener's load. Failure modes, in order: UART noise / intermittent sync
+  failures → shifted logic thresholds (the level-shifter sees the wrong levels)
+  → worst case, damaging circulating current through traces not built for it.
+
+**Recommended: isolate each opener channel.** Put optoisolators (or a digital
+isolator) on that channel's TX/RX and power its interface side from an **isolated
+DC-DC converter**, so each opener keeps its own floating ground and nothing is
+bridged. (This is why single-opener boards like ratgdo simply power the ESP from
+that one opener — a single ground domain avoids the issue by construction.)
+
+Alternatives:
+
+- **One ESP32 per opener** — electrically cleanest (each powered from its own
+  opener); gives up the shared-board benefit.
+- **Non-isolated, carefully** — only if all openers are verifiably on the same
+  circuit/phase: single ESP power source, short leads, star-ground at one point.
+  This works often but carries the residual risk above; don't rely on it for a
+  permanent install.
+
 ## How this maps to the component config
 
 ```yaml
