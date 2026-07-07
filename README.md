@@ -1,6 +1,7 @@
 # esphome-gdo
 
 [![CI](https://github.com/jbunting/esphome-gdo/actions/workflows/ci.yml/badge.svg)](https://github.com/jbunting/esphome-gdo/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/jbunting/esphome-gdo?sort=semver)](https://github.com/jbunting/esphome-gdo/releases)
 
 An [ESPHome](https://esphome.io) external component for Chamberlain / LiftMaster
 **Security+ 1.0 and 2.0** garage door openers, built on top of
@@ -23,6 +24,15 @@ on one board** — declare one `secplus_gdo` hub per UART port.
 ```yaml
 external_components:
   - source: github://jbunting/esphome-gdo
+    components: [secplus_gdo]
+```
+
+Pin a released version instead of tracking `main` by appending `@<version>`
+(releases use ESPHome-style CalVer, e.g. `2026.7.0`):
+
+```yaml
+external_components:
+  - source: github://jbunting/esphome-gdo@2026.7.0
     components: [secplus_gdo]
 ```
 

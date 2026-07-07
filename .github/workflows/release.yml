@@ -1,0 +1,66 @@
+name: Release
+
+# Manually cut a release. There is no binary to publish — this is a
+# source-consumed ESPHome external component — so a "release" is a git tag plus
+# a GitHub Release (GitHub attaches the source archive automatically). Consumers
+# can then pin a version:  github://jbunting/esphome-gdo@2026.7.0
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (blank = auto CalVer YYYY.M.patch)"
+        required: false
+        default: ""
+      prerelease:
+        description: "Mark as a pre-release"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need full history + tags to compute the next version
+
+      - name: Determine version
+        id: ver
+        run: |
+          set -euo pipefail
+          version="${{ inputs.version }}"
+          if [ -z "$version" ]; then
+            # CalVer: YYYY.M (no leading zero on month), patch auto-increments
+            # within the month.
+            ym="$(date +%Y.%-m)"
+            last="$(git tag -l "${ym}.*" | sed "s/^${ym}\.//" | grep -E '^[0-9]+$' | sort -n | tail -1 || true)"
+            if [ -z "$last" ]; then patch=0; else patch=$((last + 1)); fi
+            version="${ym}.${patch}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Releasing $version"
+
+      - name: Verify tag does not exist
+        run: |
+          if git rev-parse "refs/tags/${{ steps.ver.outputs.version }}" >/dev/null 2>&1; then
+            echo "::error::Tag ${{ steps.ver.outputs.version }} already exists"
+            exit 1
+          fi
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.ver.outputs.version }}" \
+            --title "${{ steps.ver.outputs.version }}" \
+            --target "${{ github.sha }}" \
+            --generate-notes \
+            ${{ inputs.prerelease && '--prerelease' || '' }}
